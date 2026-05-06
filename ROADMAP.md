@@ -59,7 +59,7 @@ flags: `[ ]` not started, `[~]` in progress, `[x]` shipped.
 
 ### Incremental
 - [x] **`/muestra` public live-brief page.** *Shipped May 2026.* Server page (`src/app/muestra/page.tsx`) wraps a client component (`MuestraClient.tsx`) that takes `?n=&d=&l=` query params, fetches `/api/brief`, and renders a polished, print-friendly, share-able brief matching the existing ink/amber aesthetic. URL itself is the share key. Marketing Nav now links here as "Probar gratis."
-- [ ] **Collapse pricing to one plan for Phase-1.** Esencial/Pro/Cadena → "Sereno · S/249/mes" only. Three tiers re-introduced at ~30 paying customers. Reduces checkout cognitive load.
+- [x] **Collapse pricing to one plan for Phase-1.** *Shipped May 2026.* `lib/plans.ts` adds `getActivePlans()` gated by `PHASE_1_ACTIVE_SLUGS = ['pro']`. `pricing/page.tsx` and home page hero render a single centered "Sereno · S/249/mes" card when only one plan is active. Full PLANS / PLAN_LIST stay defined so legacy subscriptions resolve. Revert by changing `PHASE_1_ACTIVE_SLUGS` or setting `NEXT_PUBLIC_VIGIA_ALL_PLANS=true`.
 - [ ] **Sample-week trigger on signup.** Manual operator-reviewable sample brief delivered the Monday immediately after signup, so first-week retention isn't a 6-day wait.
 - [ ] **Ronda/sereno copy across `/admin` and email templates.** *"La ronda de esta semana"*, *"El sereno detectó 3 cambios"*. Couples to the rename — execute as part of `RENAME-PLAN.md` Step 3 after `serenowatch.com` is registered.
 
