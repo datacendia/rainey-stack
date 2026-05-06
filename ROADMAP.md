@@ -5,6 +5,10 @@ flags: `[ ]` not started, `[~]` in progress, `[x]` shipped.
 
 ---
 
+> **Always-fresh status:** check `BUGS.md` before starting any item below — some are blocked by upstream defects.
+
+---
+
 ## raineylagunastudios — parent studio
 
 ### Incremental
@@ -13,9 +17,9 @@ flags: `[ ]` not started, `[~]` in progress, `[x]` shipped.
 - [ ] **Public Manifesto changelog.** Render a `/changelog` page that diffs every Manifesto revision with timestamp + Lima-weather snapshot. Makes the existing mechanic legible.
 
 ### WOW
-- [ ] **The Lima Almanac.** Yearly printed almanac of "what we learned about Lima this year": weather extremes, 12 notable Lima SMB sites, project lessons. 200 numbered copies, free to past clients, $40 otherwise. Reuses Postcard infrastructure. Builds keepable physical artefacts year-over-year.
-  - Year-1 budget: ~$1k (200 × $5 print+postage).
-  - Pages: `/almanac` (back issues) + Stripe Checkout for paid copies + CSV ship-list pulled from CRM.
+- [ ] **The Lima Almanac.** Yearly printed almanac of "what we learned about Lima this year": weather extremes, 12 notable Lima SMB sites, project lessons. 200 numbered copies, free to past clients, S/149 otherwise. Reuses Postcard infrastructure. Builds keepable physical artefacts year-over-year.
+  - Year-1 budget: ~S/3k (200 × ~S/15 print+postage).
+  - Pages: `/almanac` (back issues) + **Culqi Checkout** (cards + Yape) for paid copies + CSV ship-list pulled from CRM. *Do not use Stripe — see `PAYMENTS.md`.*
 
 ---
 
@@ -23,7 +27,7 @@ flags: `[ ]` not started, `[~]` in progress, `[x]` shipped.
 
 ### Incremental
 - [ ] **Move the audit form above the fold.** Single-input hero: *"¿Cuál es tu web?"*. Rain shader runs behind it. Strongest conversion moment should not be a page away.
-- [ ] **Wire contact form to WhatsApp** in addition to CRM. `wa.me/51...?text=Hola+Rainey+Laguna` on the success state. ~6 lines of code; Lima SMBs default to WhatsApp.
+- [x] **Wire contact form to WhatsApp** in addition to CRM. *Already shipped* — `ContactForm.tsx:88` opens `wa.me/51912418482` on submit; success state shows the link. Verified May 2026.
 - [x] ~~Public audit gallery~~ — *cancelled (operator decision: SMBs won't appreciate public scoring)*.
 
 ### WOW
@@ -39,8 +43,8 @@ flags: `[ ]` not started, `[~]` in progress, `[x]` shipped.
 
 ### Incremental
 - [ ] **Snooze + Next-Action column.** Kanban cards show the next *verb* ("Send audit video", "Follow up in 3 days"), not just status. Cuts daily triage from ~20 min to ~2.
-- [ ] **Click-to-WhatsApp on every lead card.** Either Twilio (rich tracking, reuses Vigía's setup) or `wa.me` link (zero infra). Pick `wa.me` for v1.
-- [ ] **Self-mailed Monday digest.** Cron sends operator a 5-line summary: leads added / cold / proposals out / wins / next actions for the week.
+- [ ] **Click-to-WhatsApp on every lead card.** Either Twilio (rich tracking, reuses Vigía's setup) or `wa.me` link (zero infra). Pick `wa.me` for v1. **BLOCKED** by `BUGS.md` §"lead-intake contract is broken" — needs `phone` column on `crm_leads` first.
+- [x] **Self-mailed Monday digest.** *Shipped as `/dashboard/digest` server-rendered page* (May 2026). Operator bookmarks it; no email infra needed. External cron can curl-and-email later if push delivery becomes useful. See `raineylaguna-crm/src/app/dashboard/digest/page.tsx`.
 
 ### WOW
 - [ ] **AI-drafted outreach.** Daily Anthropic-powered drafter generates 3-line WhatsApp messages for every overdue lead, surfaced on each card. One-click review → send via Twilio. Targets ~5×ing daily outreach volume at the same wall-clock cost.
@@ -90,5 +94,13 @@ Cheap-and-now → expensive-and-later, with WOWs sequenced to avoid blocking on 
 | 14| **raineylaguna WOW**| 60-Second Site               | 2-3 days | Meta Graph token     |
 | 15| **Sereno WOW**     | Counter-Move + banners        | 3-4 days | rename complete (so banners ship under correct brand) |
 | 16| Sereno             | Ronda/sereno copy             | bundled with rename | `serenowatch.com` registered |
+| ~~17~~ | ~~Sereno~~ | ~~Enable Yape on Culqi checkout~~ | ~~30 min~~ | **already shipped** — see `BUGS.md` discovery |
 
-Total ~3–4 weeks of focused work to ship all 16 items.
+Total ~3–4 weeks of focused work to ship the remaining items.
+
+## Shipped this session (May 2026)
+
+- ✅ **Item 1** (raineylaguna.com WhatsApp link) — found already shipped, no work needed.
+- ✅ **Item 17** (Yape on Sereno checkout) — found already shipped, no work needed.
+- ✅ **Item 3** (CRM Monday digest) — shipped as `/dashboard/digest` server-rendered page in `raineylaguna-crm`.
+- 📝 **`BUGS.md`** — logged the broken lead-intake contract (missing `/api/leads/public` route + missing `email`/`phone` columns on `crm_leads`). Critical, blocks Item 2.
