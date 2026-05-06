@@ -53,7 +53,7 @@ flags: `[ ]` not started, `[~]` in progress, `[x]` shipped.
   - New lib: `src/lib/anthropic.ts` (native fetch, no SDK dep).
   - System prompt locked to `v1-2026-05-06`; bumps tracked in `prompt_version` column for A/B comparison.
   - **Operator setup:** set `ANTHROPIC_API_KEY` in CRM Railway env. Optional: `ANTHROPIC_MODEL` (default `claude-3-5-sonnet-20241022`). Run migration `database/migrations/2026-05-06-outreach-drafts.sql`.
-  - **Deferred:** auto-generation cron (Mon/Wed/Fri 6am for untouched ≥ 7-day leads) — code is ready to wrap, just hadn't shipped a worker yet. Add when daily lead volume justifies it.
+  - **Auto-generation cron** *shipped May 2026.* `scripts/draft-outreach-cron.ts` (run as `npm run draft-outreach-cron` from Railway scheduled job). Picks cold leads (`pipeline_stage='Lead'`, ≥ 7 days old, no outreach events, no active snooze, no pending draft) and generates drafts at 1.5s pacing. Caps at 25 leads/run by default (`DRAFT_CRON_MAX_LEADS`). Shares `src/lib/draft-outreach.ts` with the on-demand route so the prompt stays single-source. Suggested schedule: `0 11 * * 1,3,5` in UTC (= 6am America/Lima Mon/Wed/Fri). Dry-run: `DRAFT_CRON_DRY_RUN=true npm run draft-outreach-cron`.
 
 ---
 
