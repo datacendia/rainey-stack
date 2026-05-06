@@ -12,9 +12,9 @@ flags: `[ ]` not started, `[~]` in progress, `[x]` shipped.
 ## raineylagunastudios — parent studio
 
 ### Incremental
-- [ ] **`/who-we-serve` page.** One sentence per vertical. Converts "cool site" → "I get what they sell." Linked from primary nav and footer.
-- [ ] **Weekly Kiln cap.** Replace on-demand firing with a Monday-only schedule, "next firing: Mon, N slots remaining." Scarcity > availability for parent brand.
-- [ ] **Public Manifesto changelog.** Render a `/changelog` page that diffs every Manifesto revision with timestamp + Lima-weather snapshot. Makes the existing mechanic legible.
+- [x] **`/who-we-serve` page.** *Shipped May 2026.* New `/who-we-serve/index.html` (self-contained, matches `/about/` pattern). Six one-sentence verticals: Hospitalidad, Cultura independiente, Retail de autor, Productores artesanales, Servicios profesionales, Creadores independientes — each with a Spanish + English sentence and a three-word tag. "None of the six?" door routes to `/#commission` (Reverse Commissioning). Linked from home footer map and sitemap.
+- [x] **Weekly Kiln cap.** *Shipped May 2026.* Scarcity panel (`#kilnCap`) injected above the Lab WhatsApp CTA. Reads `/data/kiln.json` (operator edits weekly), shows "Próxima cocción · LUNES 11 DE MAYO · 4 de 6 piezas libres" with a progress bar, and flips to a red-bordered "Tirada cerrada" state when full or past firing. Operator cost = 10 seconds in a phone JSON edit every Sunday. Bilingual. Fails silent if the JSON is missing.
+- [x] **Public Manifesto changelog.** *Shipped May 2026.* New `/changelog/index.html` renders every revision from `/data/manifesto.json` with timestamp, Lima-weather snapshot (summary + type `wght`/`slnt`), and a paragraph-level LCS diff versus the previous revision (additions vermilion, removals copper, unchanged dim). Operator workflow: when editing `#manifestoBody` in `index.html`, append a new revision object to `data/manifesto.json` before pushing. Linked from footer map + sitemap.
 
 ### WOW
 - [ ] **The Lima Almanac.** Yearly printed almanac of "what we learned about Lima this year": weather extremes, 12 notable Lima SMB sites, project lessons. 200 numbered copies, free to past clients, S/149 otherwise. Reuses Postcard infrastructure. Builds keepable physical artefacts year-over-year.
