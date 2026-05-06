@@ -65,11 +65,7 @@ flags: `[ ]` not started, `[~]` in progress, `[x]` shipped.
 - [ ] **Ronda/sereno copy across `/admin` and email templates.** *"La ronda de esta semana"*, *"El sereno detectó 3 cambios"*. Couples to the rename — execute as part of `RENAME-PLAN.md` Step 3 after `serenowatch.com` is registered.
 
 ### WOW
-- [ ] **The Counter-Move.** Every signal in the weekly brief gets *"Tu jugada esta semana"* + (where applicable) a pre-built Instagram banner the operator can paste directly. Closes the know→do gap, justifies premium pricing, creates passive viral surface (every banner posted is a subtle Sereno ad).
-  - Banner generation via `next/og` (Satori) — already in Next 16.
-  - Counter-move text via existing Anthropic call (extend prompt).
-  - Schema additions: `briefs.counter_moves jsonb`, `briefs.assets jsonb`.
-  - Estimated: 3–4 days.
+- [x] **The Counter-Move — v1 shipped May 2026.** Per-signal `counter_move: { title, jugada, reason }` added to `BulletPoint` (optional, so historical briefs still deserialize). Prompt rule 6b + JSON-schema clause force Claude to return one per bullet. Renderers (WhatsApp + Markdown) surface the jugada under each signal; dry-run `mockOutput` emits placeholders so layout work doesn't burn tokens. New `GET /api/og/counter-move?brief=<id>&signal=<n>[&format=square]` route uses `next/og` `ImageResponse` to render a 1080×1350 portrait banner (or 1080×1080 square) per signal in the studios palette, with severity dot, competitor, headline, jugada title, and `vigia.pe` mark. `/app/briefs` page shows a left-bordered callout per bullet with both banner download links. Tracks `counter_move.banner_rendered` events. Banner is cached `s-maxage=86400, immutable`.<br>**Deferred to v2:** dedicated `briefs.counter_moves jsonb` / `briefs.assets jsonb` columns (current `payload` jsonb covers it; promote when a query needs to filter by counter-move state); admin `/admin/briefs/[id]/preview` surface; `vigia.pe/j/<slug>` shortlinks for sharing the banner page itself.
 
 ---
 
