@@ -47,11 +47,13 @@ flags: `[ ]` not started, `[~]` in progress, `[x]` shipped.
 - [x] **Self-mailed Monday digest.** *Shipped as `/dashboard/digest` server-rendered page* (May 2026). Operator bookmarks it; no email infra needed. External cron can curl-and-email later if push delivery becomes useful. See `raineylaguna-crm/src/app/dashboard/digest/page.tsx`.
 
 ### WOW
-- [ ] **AI-drafted outreach.** Daily Anthropic-powered drafter generates 3-line WhatsApp messages for every overdue lead, surfaced on each card. One-click review → send via Twilio. Targets ~5×ing daily outreach volume at the same wall-clock cost.
-  - New table: `outreach_drafts (lead_id, body, generated_at, status)`.
-  - New cron: `scripts/draft-outreach.ts`, Mon/Wed/Fri 6am.
-  - Reuses Anthropic key + prompt patterns from vigiaV2.
-  - Estimated: 1 day.
+- [x] **AI-drafted outreach in CRM (WOW).** *Shipped May 2026 (on-demand v1).* Operator clicks "Generate draft" on a lead detail page → Claude 3.5 Sonnet writes a personalized 90-word Spanish WhatsApp opener grounded in the lead's district / niche / website status / evaluation / strategic action. Operator can edit inline, click "Send via WhatsApp" (deep-links wa.me with the body prefilled and logs an outreach event), or "Discard."
+  - New table: `crm_outreach_drafts` (lead_id, channel, body, model, prompt_version, status, generated_at, acted_at).
+  - New API: `POST/GET/PATCH /api/leads/[id]/draft-outreach`.
+  - New lib: `src/lib/anthropic.ts` (native fetch, no SDK dep).
+  - System prompt locked to `v1-2026-05-06`; bumps tracked in `prompt_version` column for A/B comparison.
+  - **Operator setup:** set `ANTHROPIC_API_KEY` in CRM Railway env. Optional: `ANTHROPIC_MODEL` (default `claude-3-5-sonnet-20241022`). Run migration `database/migrations/2026-05-06-outreach-drafts.sql`.
+  - **Deferred:** auto-generation cron (Mon/Wed/Fri 6am for untouched ≥ 7-day leads) — code is ready to wrap, just hadn't shipped a worker yet. Add when daily lead volume justifies it.
 
 ---
 
