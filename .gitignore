@@ -1,0 +1,11 @@
+# The four product repos are independent git repos cloned into this directory.
+# Do not track their contents from the meta repo.
+raineylagunastudios/
+raineylaguna-next/
+raineylaguna-crm/
+vigiaV2/
+
+# Scratch files used by domain-availability sweeps
+.domain-check.txt
+.sereno-check.txt
+*.tmp
