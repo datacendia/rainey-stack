@@ -42,7 +42,7 @@ flags: `[ ]` not started, `[~]` in progress, `[x]` shipped.
 ## crm.raineylaguna.com — internal CRM
 
 ### Incremental
-- [ ] **Snooze + Next-Action column.** Kanban cards show the next *verb* ("Send audit video", "Follow up in 3 days"), not just status. Cuts daily triage from ~20 min to ~2.
+- [x] **Snooze + Next-Action column.** *Shipped May 2026.* New `next_action TEXT` and `snoozed_until TIMESTAMPTZ` columns on `crm_leads`. Detail page has a free-text Next Action input (saves on blur) and quick-snooze buttons (1/3/7/14/30d + Wake up). Leads list defaults to hiding snoozed leads, surfaces just-expired snoozes at the top with a `⏰ due` badge, dims actively-snoozed rows when "Include snoozed" is on, and adds a Next Action column. Run migration `database/migrations/2026-05-06-snooze-next-action.sql`.
 - [x] **Click-to-WhatsApp on every lead card.** *Shipped May 2026* with `wa.me` deep links on the lead detail header **and** as a `💬` shortcut column on the leads list. Bundled with the lead-intake bug fix that unblocked it (see `BUGS.md`).
 - [x] **Self-mailed Monday digest.** *Shipped as `/dashboard/digest` server-rendered page* (May 2026). Operator bookmarks it; no email infra needed. External cron can curl-and-email later if push delivery becomes useful. See `raineylaguna-crm/src/app/dashboard/digest/page.tsx`.
 
