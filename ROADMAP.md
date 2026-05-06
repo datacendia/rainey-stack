@@ -31,8 +31,7 @@ flags: `[ ]` not started, `[~]` in progress, `[x]` shipped.
 - [x] ~~Public audit gallery~~ — *cancelled (operator decision: SMBs won't appreciate public scoring)*.
 
 ### WOW
-- [ ] **The 60-Second Site.** Prospect inputs business name + Instagram URL + WhatsApp; within 60s a real one-page site renders on `<slug>.preview.raineylaguna.com` using their Instagram photos (via Meta Graph) and Claude-generated copy. CTA: *"Esto es generado; lo a medida toma 6 semanas. Reserva."*
-  - Reuses `vigiaV2/scripts/collectors/meta-ads.ts` Meta integration.
+- [x] **The 60-Second Site — v1 shipped May 2026.** Public form at `/proto` (page + `Proto60Form.tsx` client component): business name, one-line pitch, district, WhatsApp, up to 3 photo URLs. POSTs to `/api/proto/generate`, which calls Anthropic with the operator-tuned `proto-prompt.ts` and returns a `ProtoOutput { headline, subhead, pillars[3], about, cta }`. The result renders inline as a faithful raineylaguna-styled one-pager (hero, 3 pillar cards, optional photo grid, about, secondary CTA, studio attribution). Hard-coded prompt rules: Lima Spanish, no invention, business name verbatim in headline, no emojis. Falls back to a stub when `ANTHROPIC_API_KEY` or `PROTO_STUB_MODE=1`. Rate-limited 5/min/IP. Honeypot. Added `@anthropic-ai/sdk` to deps.<br>**Deferred to v2:** (a) persistence + shareable URLs at `<slug>.preview.raineylaguna.com` — needs Vercel KV or a small Postgres + slug router; (b) Meta Graph integration for IG URL → photo set (currently the user pastes URLs); (c) 3 alternate templates (currently one template, the most opinionated).
   - Reuses Anthropic API key already wired in vigiaV2.
   - Three Rainey-designed templates so previews still feel branded.
   - Estimated: 2–3 focused days.
