@@ -43,7 +43,7 @@ flags: `[ ]` not started, `[~]` in progress, `[x]` shipped.
 
 ### Incremental
 - [ ] **Snooze + Next-Action column.** Kanban cards show the next *verb* ("Send audit video", "Follow up in 3 days"), not just status. Cuts daily triage from ~20 min to ~2.
-- [ ] **Click-to-WhatsApp on every lead card.** Either Twilio (rich tracking, reuses Vigía's setup) or `wa.me` link (zero infra). Pick `wa.me` for v1. **BLOCKED** by `BUGS.md` §"lead-intake contract is broken" — needs `phone` column on `crm_leads` first.
+- [x] **Click-to-WhatsApp on every lead card.** *Shipped May 2026* with `wa.me` deep links on the lead detail header **and** as a `💬` shortcut column on the leads list. Bundled with the lead-intake bug fix that unblocked it (see `BUGS.md`).
 - [x] **Self-mailed Monday digest.** *Shipped as `/dashboard/digest` server-rendered page* (May 2026). Operator bookmarks it; no email infra needed. External cron can curl-and-email later if push delivery becomes useful. See `raineylaguna-crm/src/app/dashboard/digest/page.tsx`.
 
 ### WOW

@@ -5,7 +5,35 @@ through the cracks.
 
 ---
 
-## 🔴 Critical: lead-intake contract is broken
+## ✅ FIXED (commit incoming): lead-intake contract
+
+**Resolved May 2026** — see commit on `datacendia/raineylaguna-crm`. Recap of
+what was done:
+
+1. `database/migrations/2026-05-06-public-lead-intake.sql` adds `email`,
+   `phone`, `source` columns + indexes. Idempotent, runs once via
+   `SCHEMA_PATH=database/migrations/2026-05-06-public-lead-intake.sql npm run migrate`.
+2. `database/crm-schema.sql` updated so fresh installs include the columns.
+3. `src/app/api/leads/public/route.ts` created. Validates
+   `X-Lead-Intake-Secret` in constant time, de-dupes by email/phone
+   (appends to existing notes if a match is found), inserts pipeline_stage
+   `Lead`.
+4. `src/lib/types.ts` Lead type extended with `email`, `phone`, `source`.
+5. `src/app/api/leads/[id]/route.ts` PATCH allowlist now includes
+   `email` and `phone`.
+6. Lead detail page (`src/app/dashboard/leads/[id]/page.tsx`) renders
+   email/phone/source in the metadata grid plus a one-click WhatsApp
+   button in the header.
+7. Leads list page (`src/app/dashboard/leads/page.tsx`) gets a tiny `�`
+   shortcut column so you can open a chat without drilling into the lead.
+
+**Remaining manual step (operator):** set `CRM_LEAD_INTAKE_SECRET` to the
+same long random string in **both** Railway environments (raineylaguna-next
+and raineylaguna-crm). Currently defaulted to `change_me_to_a_long_random_string`.
+
+---
+
+## 📝 Historical: lead-intake contract was broken
 
 **Symptom**: leads submitted from `raineylaguna.com` contact form do not
 appear in the CRM.
@@ -45,10 +73,10 @@ worked. You never see the lead.
    Railway environments (raineylaguna-next + raineylaguna-crm). Currently
    defaulted to `change_me_to_a_long_random_string`.
 
-**Blocks**:
+**Was blocking**:
 
-- ROADMAP item #2 (click-to-WhatsApp on CRM lead cards) — needs `phone`.
-- Operator can't actually receive leads from the public site.
+- ~~ROADMAP item #2 (click-to-WhatsApp on CRM lead cards) — needs `phone`.~~ ✅
+- ~~Operator can't actually receive leads from the public site.~~ ✅
 
 ---
 
