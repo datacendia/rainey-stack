@@ -26,7 +26,7 @@ flags: `[ ]` not started, `[~]` in progress, `[x]` shipped.
 ## raineylaguna.com — web-development vertical
 
 ### Incremental
-- [ ] **Move the audit form above the fold.** Single-input hero: *"¿Cuál es tu web?"*. Rain shader runs behind it. Strongest conversion moment should not be a page away.
+- [x] **Move the audit form above the fold.** *Shipped May 2026.* Hero now has a single URL input beneath the headline — *"¿Cuál es tu web?"* / *"What's your site?"* — submitting routes to `/auditoria?url=...` (or `/en/audit?url=...`), and `AuditTool` reads the query param via `useSearchParams` and auto-kicks the audit so the visitor lands on the running progress + results, not an empty form. Input is resilient to paste artefacts (prepends `https://` if missing). Both locale routes wrapped in `<Suspense>` to satisfy Next 15 CSR-bailout rule. Rain shader continues behind the hero.
 - [x] **Wire contact form to WhatsApp** in addition to CRM. *Already shipped* — `ContactForm.tsx:88` opens `wa.me/51912418482` on submit; success state shows the link. Verified May 2026.
 - [x] ~~Public audit gallery~~ — *cancelled (operator decision: SMBs won't appreciate public scoring)*.
 
