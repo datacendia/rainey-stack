@@ -58,7 +58,7 @@ flags: `[ ]` not started, `[~]` in progress, `[x]` shipped.
 ## vigiaV2 → Sereno — the SaaS
 
 ### Incremental
-- [ ] **`/muestra` public live-brief page.** Renders the existing `/api/brief` JSON beautifully, no auth. Highest single-leverage page on the site — prospects can *read the product*, not read about it.
+- [x] **`/muestra` public live-brief page.** *Shipped May 2026.* Server page (`src/app/muestra/page.tsx`) wraps a client component (`MuestraClient.tsx`) that takes `?n=&d=&l=` query params, fetches `/api/brief`, and renders a polished, print-friendly, share-able brief matching the existing ink/amber aesthetic. URL itself is the share key. Marketing Nav now links here as "Probar gratis."
 - [ ] **Collapse pricing to one plan for Phase-1.** Esencial/Pro/Cadena → "Sereno · S/249/mes" only. Three tiers re-introduced at ~30 paying customers. Reduces checkout cognitive load.
 - [ ] **Sample-week trigger on signup.** Manual operator-reviewable sample brief delivered the Monday immediately after signup, so first-week retention isn't a 6-day wait.
 - [ ] **Ronda/sereno copy across `/admin` and email templates.** *"La ronda de esta semana"*, *"El sereno detectó 3 cambios"*. Couples to the rename — execute as part of `RENAME-PLAN.md` Step 3 after `serenowatch.com` is registered.
