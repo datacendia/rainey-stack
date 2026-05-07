@@ -21,10 +21,18 @@ meta repo decoupled from their commit graphs.
 
 ## Files
 
+> **Read `CONVENTIONS.md` first, every session.** It is the load-bearing
+> document that keeps the four repos coherent across AI sessions. Everything
+> else here is reference; that one is canon.
+
 | File              | What                                                    |
 | ----------------- | ------------------------------------------------------- |
+| `CONVENTIONS.md`  | **Canonical conventions for the whole stack.** Read first. |
+| `BUGS.md`         | Known bugs, root-cause analyses, and their fixes        |
+| `ROADMAP.md`      | What is shipped, in flight, and deferred — across repos |
 | `DEPLOY.md`       | End-to-end deploy guide (Railway + Cloudflare DNS)      |
 | `BRAND.md`        | Domain decisions, naming history, registrar status      |
+| `PAYMENTS.md`     | Why Culqi (and not Stripe) in Peru — locked-in decision |
 | `RENAME-PLAN.md`  | Step-by-step plan to rename Vigía → Sereno across repos |
 
 ## Working directory layout (operator's machine)
