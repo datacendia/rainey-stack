@@ -28,6 +28,7 @@ meta repo decoupled from their commit graphs.
 | File              | What                                                    |
 | ----------------- | ------------------------------------------------------- |
 | `CONVENTIONS.md`  | **Canonical conventions for the whole stack.** Read first. |
+| `TESTS.md`        | Test catalog (~130 entries) with priority and status    |
 | `BUGS.md`         | Known bugs, root-cause analyses, and their fixes        |
 | `ROADMAP.md`      | What is shipped, in flight, and deferred — across repos |
 | `DEPLOY.md`       | End-to-end deploy guide (Railway + Cloudflare DNS)      |
