@@ -1,0 +1,21 @@
+# Globs / regexes the link-checker should skip.
+# One pattern per line. Lines starting with # are comments.
+
+# Internal IDE-only paths used in examples
+^file:///
+
+# Hostname placeholders in docs that aren't supposed to resolve
+^https?://example\.(com|org)
+^https?://your-domain\.
+
+# Cloudflare 1.1.1.1 returns 403 to lychee for hot-link protection — known good
+^https?://(www\.)?cloudflare\.com/learning/
+
+# Anthropic / Stripe docs randomly return 403 to bots; trust them
+^https?://(www\.)?anthropic\.com
+^https?://(www\.)?stripe\.com
+^https?://docs\.stripe\.com
+
+# LinkedIn / Twitter / X frequently return 403 / 999 to crawlers
+^https?://(www\.)?linkedin\.com
+^https?://(www\.)?(twitter|x)\.com

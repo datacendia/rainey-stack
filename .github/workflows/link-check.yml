@@ -1,0 +1,47 @@
+name: link-check
+
+# Validates every link in every Markdown file in this docs-only repo.
+# Catches:
+#   - Stale references to renamed files (e.g. CONVENTIONS.md moves)
+#   - Dead external links to docs Anthropic / Stripe / Twilio shuffled
+#   - Broken anchors after a heading rename
+#
+# Runs on every push and PR plus a weekly cron so dead external links
+# get caught even when nobody touches the docs.
+
+on:
+  push:
+    branches: [main, master]
+    paths: ["**/*.md", ".github/workflows/link-check.yml", ".lycheeignore"]
+  pull_request:
+    paths: ["**/*.md", ".github/workflows/link-check.yml", ".lycheeignore"]
+  schedule:
+    # Mondays 09:00 UTC = 04:00 Lima. Same cadence as the Sereno briefs.
+    - cron: "0 9 * * 1"
+
+jobs:
+  lychee:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run lychee link checker
+        uses: lycheeverse/lychee-action@v2
+        with:
+          # --no-progress           quieter logs
+          # --max-concurrency 8     polite to upstream hosts
+          # --exclude-loopback      skip http://localhost (used in examples)
+          # --exclude-mail          skip mailto: (false-positive heavy)
+          args: >-
+            --no-progress
+            --max-concurrency 8
+            --exclude-loopback
+            --exclude-mail
+            --accept 200,206,429
+            **/*.md
+          fail: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
