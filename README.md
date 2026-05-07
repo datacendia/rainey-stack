@@ -29,6 +29,8 @@ meta repo decoupled from their commit graphs.
 | ----------------- | ------------------------------------------------------- |
 | `CONVENTIONS.md`  | **Canonical conventions for the whole stack.** Read first. |
 | `TESTS.md`        | Test catalog (~130 entries) with priority and status    |
+| `DECISIONS.md`    | ADR-style log of every locked-in decision and its rationale |
+| `RUNBOOKS.md`     | Operator playbooks per failure mode (page-at-03:00 doc) |
 | `BUGS.md`         | Known bugs, root-cause analyses, and their fixes        |
 | `ROADMAP.md`      | What is shipped, in flight, and deferred — across repos |
 | `DEPLOY.md`       | End-to-end deploy guide (Railway + Cloudflare DNS)      |
