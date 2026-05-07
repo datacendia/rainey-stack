@@ -64,6 +64,17 @@ Archived (do not touch):
 
 When a repo's GitHub name disagrees with its local folder name (`vigiaV2` → `c:\Users\Stu\vigia`), prefer **the GitHub name in writing** and the local path **in commands**. The `vigia*` legacy will get cleaned up in a single rename pass; until then, do not introduce *more* names.
 
+> **Gotcha — `vigia/` has two git remotes.** Inside `c:\Users\Stu\vigia` the
+> remote `origin` points to the **archived** `datacendia/vigia.git`, and the
+> remote `v2` points to the **canonical** `datacendia/vigiaV2.git`. Local
+> `master` tracks `v2/master`. **Always push with `git push v2 …`** when
+> working in this folder. Pushing to `origin` pollutes the archived repo
+> with new commits and silently bypasses the canonical history. Verify with
+> `git remote -v` and `git branch -vv` before any push that doesn't go
+> through the upstream tracking branch. (This will be cleaned up by
+> renaming `v2` → `origin` and dropping the archived remote in a focused
+> chore PR; until then, the two-remote layout is the rule.)
+
 ---
 
 ## 2 · Domains and DNS
