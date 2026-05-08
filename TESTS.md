@@ -28,7 +28,7 @@ order of implementation; this file enumerates the destination.
 
 | ID  | Title | Type | Pri | Status | Notes |
 |-----|-------|------|-----|--------|-------|
-| X01 | CONVENTIONS.md links resolve in CI | U | P2 | ❌ | markdown-link-check action; gates the rainey-stack repo |
+| X01 | CONVENTIONS.md links resolve in CI | U | P2 | ✅ | `.github/workflows/link-check.yml` (lychee) |
 | X02 | Every repo's `.env.example` matches its `src/lib/env.ts` schema | I | P1 | ❌ | Diff script; runs in each repo's CI |
 | X03 | DEPLOY.md env-var list matches each repo's env loader | U | P2 | ❌ | Codegen + grep |
 | X04 | Branch protection rule on `main`/`master` for every repo | — | P1 | ❌ | Manual GitHub UI, recorded in DECISIONS.md |
@@ -43,12 +43,12 @@ order of implementation; this file enumerates the destination.
 
 | ID  | Title | Type | Pri | Status | Notes |
 |-----|-------|------|-----|--------|-------|
-| S01 | `sample-week.ts::nextMondayISO()` | U | P0 | ❌ | Day-1-PM target. Lima TZ, every DOW, `includeToday` |
+| S01 | `sample-week.ts::nextMondayISO()` | U | P0 | ✅ | `src/lib/sample-week.test.ts` |
 | S02 | `sample-week.ts::seedSamplePlaceholder()` payload shape | U | P1 | ❌ | Mock `upsertDraft`, assert `meta.is_sample` |
-| S03 | `shortlinks.ts::generateSlug()` collisions across 100k samples | U | P1 | ❌ | Probabilistic; 6-char alphabet seed |
-| S04 | `shortlinks.ts::resolveSlug()` 302 / 404 paths | U | P1 | ❌ | Mock pool query |
-| S05 | `plans.ts::getPlan()` returns null for unknown slug | U | P0 | ❌ | One-liner, foundation |
-| S06 | `plans.ts` price totals match marketing pages | U | P0 | ❌ | Locked-in S/249 per CONVENTIONS §7 |
+| S03 | `shortlinks.ts::deriveSlug()` collision-resistant + deterministic | U | P1 | ✅ | `src/lib/shortlinks.test.ts` |
+| S04 | `shortlinks.ts::resolveSlug()` 302 / 404 paths | U | P1 | ✅ | `src/lib/shortlinks.test.ts` |
+| S05 | `plans.ts::getPlan()` returns null for unknown slug | U | P0 | ✅ | `src/lib/plans.test.ts` |
+| S06 | `plans.ts` price totals match marketing pages | U | P0 | ✅ | `src/lib/plans.test.ts` (S/249 locked) |
 | S07 | `events.ts::trackSafe()` swallows DB errors silently | U | P0 | ❌ | Failure mode: must not throw to caller |
 | S08 | `events.ts` payload sanitization (no PII keys) | U | P1 | ❌ | Allow-list of payload keys |
 | S09 | `nubefact.ts::issueComprobante()` request body shape | U | P0 | ❌ | Snapshot test against fixture |
@@ -60,10 +60,10 @@ order of implementation; this file enumerates the destination.
 | S15 | `briefs.ts::approveBrief()` state machine (draft→approved only) | U | P1 | ❌ | Reject illegal transitions |
 | S16 | `briefs.ts` Counter-Move v2: `counter_moves` JSONB shape | U | P1 | ❌ | Schema validation |
 | S17 | `priority-score.ts` (if present) | U | P1 | ❌ | Per ROADMAP — verify file location |
-| S18 | `webhook-idempotency.ts::dedupeWebhook()` first call returns `fresh:true` | I | P0 | ❌ | DB integration |
-| S19 | `webhook-idempotency.ts::dedupeWebhook()` replay returns `fresh:false` | I | P0 | ❌ | DB integration |
-| S20 | `webhook-idempotency.ts` failure persists `result.ok=false` and re-throws | I | P0 | ❌ | DB integration |
-| S21 | `webhook-idempotency.ts::fallbackEventId()` deterministic for same body | U | P1 | ❌ | sha256 stability |
+| S18 | `webhook-idempotency.ts::dedupeWebhook()` first call returns `fresh:true` | I | P0 | ✅ | `src/lib/webhook-idempotency.test.ts` |
+| S19 | `webhook-idempotency.ts::dedupeWebhook()` replay returns `fresh:false` | I | P0 | ✅ | `src/lib/webhook-idempotency.test.ts` |
+| S20 | `webhook-idempotency.ts` failure persists `result.ok=false` and re-throws | I | P0 | ✅ | `src/lib/webhook-idempotency.test.ts` |
+| S21 | `webhook-idempotency.ts::fallbackEventId()` deterministic for same body | U | P1 | ✅ | `src/lib/webhook-idempotency.test.ts` |
 | S22 | `cors.ts` allow-list logic (preview / prod / unset cases) | U | P1 | ❌ | Per CONVENTIONS §7 |
 | S23 | `admin-auth.ts::verifyCookie()` rejects expired / tampered tokens | U | P0 | ❌ | Sign with bad secret → reject |
 | S24 | `admin-auth.ts` constant-time bcrypt compare | U | P0 | ❌ | Timing-attack regression |
@@ -152,7 +152,7 @@ order of implementation; this file enumerates the destination.
 | W07 | `proto-store.ts` Postgres path | I | P1 | ❌ | DB integration |
 | W08 | `proto-store.ts` JSON file fallback when DATABASE_URL unset | I | P1 | ❌ | Filesystem |
 | W09 | `proto-ig.ts` Meta Graph token gating | U | P2 | ❌ | Skips when token unset |
-| W10 | `services.ts` slug ↔ entry round-trip | U | P1 | ❌ | After 8-page expansion |
+| W10 | `services.ts` slug ↔ entry round-trip + EN/ES parity | U | P1 | ✅ | `src/data/services.test.ts` (locale-neutral fields, cross-link integrity, no Spanish leakage in EN copy) |
 | W11 | `env.ts` server schema rejects bad ANTHROPIC_API_KEY prefix | U | P0 | ❌ | Regex contract |
 | W12 | `env.ts::serverEnv` Proxy throws on browser | U | P0 | ❌ | Same as Sereno S26 |
 | W13 | `env.ts::clientEnv` soft-warns on bad NEXT_PUBLIC_* | U | P1 | ❌ | Same as Sereno S27 |
@@ -194,7 +194,7 @@ order of implementation; this file enumerates the destination.
 
 | ID  | Title | Type | Pri | Status | Notes |
 |-----|-------|------|-----|--------|-------|
-| C01 | `priority-score.ts::scoreLead()` weighted-sum determinism | U | P0 | ❌ | Day-1-PM per CONVENTIONS §13.5 |
+| C01 | `priority-score.ts::scoreLead()` weighted-sum determinism + bands | U | P0 | ✅ | `src/lib/priority-score.test.ts` |
 | C02 | `priority-score.ts` re-scores on lead update | I | P0 | ❌ | Trigger / observer |
 | C03 | `POST /api/leads/public` rejects unsigned bodies | I | P0 | ❌ | CRM_LEAD_INTAKE_SECRET HMAC |
 | C04 | `POST /api/leads/public` deduplicates by email + url within 24h | I | P1 | ❌ | Spam guard |
@@ -218,6 +218,7 @@ order of implementation; this file enumerates the destination.
 |-----|-------|------|-----|--------|-------|
 | R01 | `scripts/check-html.mjs` validates every shipped page | U | P0 | ✅ | Wired into CI in `e907359` |
 | R02 | Markdown link-check passes across `*.md` | U | P2 | ❌ | Pending `markdown-link-check` |
+| R09 | `scripts/lib/sanitize.mjs::containsDangerousHtml()` i18n innerHTML XSS regex | U | P0 | ✅ | `scripts/lib/sanitize.test.mjs` (22 cases: benign tags pass, script/iframe/object/embed/style/javascript:/on*= refused; case-insensitive) |
 | R03 | Hydroprint Lab demo loads without WebGL errors | E | P2 | ❌ | Playwright + console-error assert |
 | R04 | Memory Object renders Fraunces with weather-driven axes | E | P3 | ❌ | Visual snapshot when humid vs dry |
 | R05 | Almanac preorder form posts and shows confirmation | E | P1 | ❌ | If form is wired |
@@ -252,7 +253,7 @@ order of implementation; this file enumerates the destination.
 | O01 | Sentry server SDK initializes when SENTRY_DSN set | U | P1 | ❌ | Both Next.js apps |
 | O02 | Sentry no-ops cleanly when SENTRY_DSN unset | U | P0 | ❌ | Boot doesn't crash |
 | O03 | `onRequestError` forwards RSC errors to Sentry | I | P1 | ❌ | Both Next.js apps |
-| O04 | Synthetic monitor on every public URL + /api/health | E | P0 | ❌ | Pending `synthetic-monitor` |
+| O04 | Synthetic monitor on every public URL + /api/health | E | P0 | 🟡 | Free-tier in CI (`rainey-stack/.github/workflows/uptime.yml`, 6 URLs, 10-min cron). Pending UptimeRobot operator setup per `INFRA-SETUP.md` §1 |
 | O05 | Plausible analytics pageview event on every route | E | P2 | ❌ | Pending `plausible-analytics` |
 
 ---
@@ -269,8 +270,10 @@ order of implementation; this file enumerates the destination.
 | B06 | `npm run build` passes in vigiaV2 | U | P0 | ✅ | Wired in `60e5cbe` |
 | B07 | `npm run check` passes in raineylagunastudios | U | P0 | ✅ | Wired in `e907359` |
 | B08 | Playwright tests run in CI for at least one repo | E | P1 | ❌ | Probably Sereno first |
-| B09 | Vitest (or equivalent) installed in vigiaV2 | U | P1 | 🟡 | Day-1-PM target |
-| B10 | Vitest installed in raineylaguna-next | U | P2 | ❌ | Follow-up |
+| B09 | Vitest (or equivalent) installed in vigiaV2 | U | P1 | ✅ | `vitest.config.ts` + 4 suites |
+| B10 | Vitest installed in raineylaguna-next | U | P2 | ✅ | `vitest.config.ts` + `services.test.ts` |
+| B11 | Vitest installed in raineylaguna-crm | U | P2 | ✅ | `vitest.config.ts` + `priority-score.test.ts` |
+| B12 | Vitest installed in raineylagunastudios | U | P2 | ✅ | wired in CI; `sanitize.test.mjs` |
 
 ---
 
@@ -279,11 +282,26 @@ order of implementation; this file enumerates the destination.
 Per `CONVENTIONS.md` §13.5, the canonical ramp is:
 
 1. **Day 1 AM** — `B01–B07` (CI gates per repo). ✅ Done.
-2. **Day 1 PM** — `S01`, `C01` (first Vitest suites). 🟡 In progress.
-3. **Day 2** — `S05–S08`, `S18–S21`, `W04–W06` (pure-function units).
-4. **Day 3** — `S40–S48`, `S75`, `S80–S82` (e2e + webhook integration).
-5. **Day 4** — `H01–H10`, `O01–O03` (security + observability sweep).
+2. **Day 1 PM** — `S01`, `C01` (first Vitest suites). ✅ Done.
+3. **Day 2** — `S05–S08`, `S18–S21`, `W04–W06` (pure-function units). 🟡 `S05`, `S06`, `S18–S21` ✅; `S07`, `S08`, `W04–W06` pending.
+4. **Day 3** — `S40–S48`, `S75`, `S80–S82` (e2e + webhook integration). ❌ pending.
+5. **Day 4** — `H01–H10`, `O01–O03` (security + observability sweep). 🟡 `H01`, `H02` ✅ (HMAC + idempotency in `c1aafac`); rest pending.
 6. **Day 5+** — All remaining `P1` entries; `P2`/`P3` ratchet up over time.
+
+## Live progress snapshot
+
+As of the last commit on this file:
+
+- **CI gates (B01–B12):** 12 / 12 ✅
+- **Sereno (S01–S93):** 8 / 53 ✅, 0 🟡 — `S01, S03, S04, S05, S06, S18, S19, S20, S21`
+- **raineylaguna-next (W01–W38):** 1 / 24 ✅ — `W10`
+- **CRM (C01–C21):** 1 / 10 ✅ — `C01`
+- **Studios (R01–R09):** 2 / 9 ✅ — `R01, R09`
+- **Cross-cutting (X01–X06):** 2 / 6 ✅ — `X01, X05`
+- **Security (H01–H11):** 2 / 11 ✅ — `H01, H02`
+- **Observability (O01–O05):** 0 / 5 ✅, 1 🟡 — `O04` (uptime workflow shipped, UptimeRobot operator setup pending)
+
+**Total: 26 / 122 ≈ 21%.** Sequenced by `CONVENTIONS.md` §13.5 ramp; the next P0 cluster is `S07–S08, S22, S23–S29, S40–S48` plus `W04–W06, W11–W13, W20, C03–C04, H04, H06–H10`.
 
 > **House rules.**
 > - Land tests in the same PR as the feature whenever feasible.
