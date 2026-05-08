@@ -70,17 +70,17 @@ Repos referenced:
 | #  | Repo  | Item                                               | Status | Evidence |
 |----|-------|----------------------------------------------------|--------|----------|
 | 22 | `vV2` | Vitest for sample-week / shortlinks / brief schema | `[x]`  | `vitest.config.ts`; `src/lib/sample-week.test.ts`, `shortlinks.test.ts`, `plans.test.ts`, `webhook-idempotency.test.ts`; `package.json` `"test": "vitest"` |
-| 21 | `rln` | Vitest harness + env-loader test                   | `[x]`  | `vitest.config.ts` + `src/lib/env.test.ts` — see this PR (#21 was originally "Vitest for `lima-weather.ts` + `shortlinks.ts` + brief schema". `lima-weather.ts` does **not** live in this repo (it's in `rls/scripts/` driving the Living Manifesto static page); `shortlinks` and brief schema live in `vV2`. The portable test target in `rln` is the env loader, which is what we landed.) |
-| 20 | `crm` | priority-score test                                | `[?]`  | unverifiable |
-| 23 | `vV2` | Playwright e2e Sereno pipeline                     | `[ ]`  | `playwright` is in deps but **no `playwright.config.ts` and no `tests/e2e/`**. Open work item. |
-| 24 | `crm` | webhook tests                                      | `[?]`  | unverifiable |
+| 21 | `rln` | Vitest harness + env-loader test                   | `[x]`  | `vitest.config.ts` + `src/lib/env.test.ts` + `src/data/services.test.ts`. (#21 originally said "Vitest for `lima-weather.ts` + `shortlinks.ts` + brief schema" — `lima-weather` lives in `rls`, the others in `vV2`. The portable test targets in `rln` are the env loader and the services catalogue.) |
+| 20 | `crm` | priority-score test                                | `[?]`  | sandbox cannot access `crm` repo |
+| 23 | `vV2` | Playwright e2e Sereno pipeline                     | `[x]`  | `playwright.config.ts` + `e2e/landing.spec.ts` (3 marketing-funnel smokes) + `e2e/api.spec.ts` (4 public-signals contract tests). `@playwright/test` moved to devDeps; `npm run e2e` runs the suite. |
+| 24 | `crm` | webhook tests                                      | `[?]`  | sandbox cannot access `crm` repo |
 
 ## Customer-facing UI (vigiaV2 / Sereno)
 
 | #  | Item                                              | Status | Evidence |
 |----|---------------------------------------------------|--------|----------|
-| 26 | Self-service cancel at `/app/settings`            | `[~]`  | `src/app/app/settings/page.tsx` exists (65 lines) but no `cancel`/`subscription` strings detected. Likely placeholder — needs a Culqi `/api/subscription/cancel` route, settings UI button, and confirmation modal. Open work. |
-| 27 | Counter-Move "did this" tracker UI                | `[ ]`  | Only `src/app/api/og/counter-move/` (OG image generation) exists. No tracker UI / no DB column / no API endpoint. Open work. |
+| 26 | Self-service cancel at `/app/settings`            | `[x]`  | `src/lib/culqi.ts#cancelSubscription`, `src/app/api/app/subscription/cancel/route.ts` (zod-validated, idempotent, rate-limited 5/5min, `subscription.canceled` event with reason), `src/app/app/settings/CancelSubscriptionPanel.tsx` (two-step confirm + reason textbox + error display), wired into the Plan section of `/app/settings`. |
+| 27 | Counter-Move "did this" tracker UI                | `[x]`  | Tracker existed in `MoveTracker.tsx` (state machine `pending → in_progress → done | skipped`, outcome notes, optimistic UI). This PR adds: (a) `getMoveStats()` in `src/lib/moves.ts` for 30-day roll-up with `actionRate` excluding skipped, (b) `MoveSummary.tsx` rendering counts + segmented progress bar above the latest brief, (c) prominent amber "✓ Hice esto" primary action distinct from the granular state buttons. |
 
 ## API & routing
 
@@ -88,8 +88,8 @@ Repos referenced:
 |----|-------|---------------------------------------------------|--------|----------|
 | 33 | `vV2` | Per-tenant Anthropic budget cap + cron            | `[x]`  | `src/app/api/cron/anthropic-budget-check/` route; `.env.example` exposes `ANTHROPIC_MONTHLY_BUDGET_USD_PER_TENANT` |
 | 34 | `vV2` | `/api/public-signals` with `s-maxage` cache       | `[x]`  | New route added in this PR. `src/app/api/signals` was a mock-data endpoint; `/api/public-signals` is the cache-headed, anonymized public read meant for marketing-site embeds. |
-| 25 | `rln` | `/servicios` EN mirror at `/en/services/{slug}/`  | `[~]`  | This PR adds skeleton route files for all 8 services with English meta + hreflang; long-form ES copy still surfaced inline with a "translation in progress" banner. Full English `SERVICES_EN` data deferred to a follow-up PR (≈ 50 KB of business copy to translate carefully). |
-| 38 | `rln` | `next/image` migration audit                      | `[~]`  | Only one file references `<img>`: `src/lib/proto-templates.tsx` — these are **template strings** that produce HTML for Anthropic-generated previews rendered as raw HTML (`dangerouslySetInnerHTML`); converting to `next/image` is not applicable for output strings. No raw `<img>` tags remain in JSX. |
+| 25 | `rln` | `/servicios` EN mirror at `/en/services/{slug}/`  | `[x]`  | Skeleton + full long-form translation. `SERVICES_EN` now has `sections` + `faq` for all 8 services in addition to the previously-shipped hero/meta/includes/pricing/CTA. `EnglishServicePage.tsx` renders entirely in English (no Spanish-prose fallback banner). Cross-link descriptions pull the EN tagline from the linked service. Sitemap + hreflang + canonical correct. AI-translated; flagged in the file header for native-speaker review before any major campaign. |
+| 38 | `rln` | `next/image` migration audit                      | `[N/A]` | Only `src/lib/proto-templates.tsx` uses `<img>` — 3 instances rendering arbitrary user-supplied photo URLs (Meta IG API, pasted CDNs). `next/image` requires the host to be in `next.config.js#images.remotePatterns`; whitelisting "any host" defeats the optimizer's security model. Each tag is intentionally `eslint-disable`d and the rationale is now in the file header. Conclusion: keep `<img>`. |
 
 ## raineylaguna-next other items
 
@@ -105,6 +105,13 @@ Repos referenced:
 | 37 | SRI hashes on CDN imports                         | `[N/A]` | `index.html`, `404.html`, `og-image.html`, `verify.html` contain **0 CDN `<script src=https://…>`** tags — all scripts are local under `/scripts/`. Google Fonts `<link>` URLs are CSS, not script integrity-hash territory. SRI re-opens **only when a CDN script is added**; the workflow now records this rule. |
 
 ## raineylaguna-crm (cannot verify from this sandbox)
+
+This sandbox is restricted to the 5 repos `vigiav2`, `raineylaguna-next`,
+`rainey-stack`, `raineylagunastudios`, `vigia`. **`raineylaguna-crm` is not in
+the allowed-repos list** — clones return `repository not authorized` from the
+proxy and the GitHub MCP refuses calls to the repo. Action required: get
+`datacendia/raineylaguna-crm` added to the sandbox's allowed-repos config,
+then these 4 items can be implemented.
 
 | #  | Item                                              | Status |
 |----|---------------------------------------------------|--------|
@@ -126,11 +133,18 @@ Repos referenced:
 
 ## Summary (verifiable in this sandbox)
 
-- **Shipped & verified:** 22 items — #1, #2, #3, #4, #5, #7, #9, #10, #11, #12, #13, #14, #15, #16, #17, #18, #19, #21, #22, #33, #34, #42
-- **Partial / skeleton:** 3 items — #25 (EN service-page mirrors), #26 (cancel UI), #38 (next/image — formally N/A but documented)
-- **Open work:** 2 items — #23 (Playwright config + first e2e in vV2), #27 (Counter-Move tracker UI)
-- **N/A with reason:** 1 item — #37 (no CDN scripts in `rls`)
-- **Unverifiable from this sandbox (`crm` + infra):** 14 items — #6, #20, #24, #28-32, #36, #39, #40, #41
+- **Shipped & verified:** 26 items — #1, #2, #3, #4, #5, #7, #9, #10, #11, #12, #13, #14, #15, #16, #17, #18, #19, #21, #22, #23, #25, #26, #27, #33, #34, #42
+- **Partial / skeleton:** 0 items
+- **Open work in scope:** 0 items
+- **N/A with reason:** 2 items — #37 (no CDN scripts in `rls`), #38 (`<img>` tags are intentional in proto-templates)
+- **Sandbox-blocked (`crm` repo not in allowed list):** 4 items — #6, #20, #24, #36
+- **Out-of-scope (need credentials, not code):** ~10 items — #28-32, #39 partial, #40, #41
+
+If the sandbox's allowed-repos list is extended to include
+`datacendia/raineylaguna-crm`, items #6, #20, #24, #36 are tractable in
+the next session. Items #28-32, #40, #41 are not code-only changes —
+they need access to DNS/Cloudflare/monitoring/analytics provider
+accounts that this sandbox doesn't have.
 
 ## How to use this doc
 
