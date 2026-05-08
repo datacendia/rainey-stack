@@ -34,12 +34,12 @@ jobs:
           # --no-progress           quieter logs
           # --max-concurrency 8     polite to upstream hosts
           # --exclude-loopback      skip http://localhost (used in examples)
-          # --exclude-mail          skip mailto: (false-positive heavy)
+          # mailto: links are excluded by default in lychee >=0.18 - the old
+          # --exclude-mail flag was removed in v0.23 and now errors out.
           args: >-
             --no-progress
             --max-concurrency 8
             --exclude-loopback
-            --exclude-mail
             --accept 200,206,429
             **/*.md
           fail: true
