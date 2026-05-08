@@ -1,0 +1,55 @@
+name: dns-drift
+
+# Runs the DNS-drift check (scripts/dns-drift.mjs) against
+# dns/expected.yml on a schedule + on PRs that touch the YAML or the
+# script. Fails if Cloudflare and the YAML disagree.
+#
+# Requires the repository secret CF_API_TOKEN with these scopes:
+#   - Zone — Zone — Read
+#   - Zone — DNS  — Read
+#   restricted to the relevant zones.
+#
+# When the secret isn't set the workflow short-circuits (no false alarms
+# during the period before the operator wires the token).
+
+on:
+  schedule:
+    - cron: '0 14 * * 1'    # Monday 14:00 UTC (after Lima Sereno send)
+  pull_request:
+    paths:
+      - 'dns/expected.yml'
+      - 'scripts/dns-drift.mjs'
+      - '.github/workflows/dns-drift.yml'
+  workflow_dispatch: {}
+
+concurrency:
+  group: dns-drift-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  drift:
+    name: Compare expected.yml against Cloudflare
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Short-circuit if CF_API_TOKEN secret is unset
+        id: gate
+        run: |
+          if [ -z "${{ secrets.CF_API_TOKEN }}" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "::notice title=DNS drift skipped::CF_API_TOKEN secret is not set; skipping. See rainey-stack/INFRA-SETUP.md."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run drift check
+        if: steps.gate.outputs.skip != 'true'
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: node scripts/dns-drift.mjs
