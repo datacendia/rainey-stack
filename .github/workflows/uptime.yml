@@ -1,0 +1,114 @@
+# Free-tier uptime check.
+#
+# Pings every public URL in the stack on a 10-minute schedule and on
+# every push to main. Fails the workflow if any URL returns a non-2xx,
+# is unreachable within 15s, or (for endpoints with a body assertion)
+# does not contain the expected substring.
+#
+# Why this exists alongside UptimeRobot (see INFRA-SETUP.md \u00a71):
+#   - Different vantage point. UptimeRobot pings from its own probes;
+#     this workflow runs from GitHub-hosted Azure runners. Both are
+#     external to Cloudflare/Railway, but a problem that hides from
+#     one network path will sometimes show up on the other.
+#   - Always-on, no third-party account or token to lose.
+#   - Failures land as red checkmarks on the rainey-stack repo, which
+#     is the operator's "is everything OK?" dashboard.
+#
+# This workflow does NOT page anyone. It just turns the workflow red.
+# Real alerting is UptimeRobot's job (email/SMS/Slack via its free tier).
+# A red workflow without a UptimeRobot alert means GitHub's view differs
+# from UptimeRobot's view -- usually a flake or a routing anomaly --
+# and is investigated next business hour, not paged.
+#
+# Cost: zero. GitHub Actions free tier on a public-account repo is
+# unlimited; on a private repo it is 2,000 minutes/month and this
+# workflow uses ~0.1 min/run x 144 runs/day = ~430 min/month.
+
+name: uptime
+
+on:
+  schedule:
+    # Every 10 minutes. GitHub may delay scheduled runs by up to ~15
+    # minutes during high cron load; a single late run is not a real
+    # signal. UptimeRobot covers the gap.
+    - cron: '*/10 * * * *'
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+# Only one uptime run at a time. If a previous run is still pinging
+# when the next cron fires, skip the new one rather than queue it --
+# stale signal is worse than missed signal here.
+concurrency:
+  group: uptime
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    name: ping public URLs
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      # Single inline check function avoids carrying a separate script
+      # file in the repo. `curl` is preinstalled on ubuntu-latest. We
+      # fail fast on the first bad URL so the failure log points at the
+      # exact endpoint that broke; UptimeRobot still pings the others.
+      - name: Ping all public URLs
+        env:
+          TIMEOUT: '15'
+        run: |
+          set -u
+          fail=0
+
+          # check_url <url> <accepted_codes_csv> [body_substring]
+          check_url() {
+            local url="$1"
+            local accepted="$2"
+            local needle="${3:-}"
+            local body_file
+            body_file="$(mktemp)"
+            local code
+            code="$(curl -sS -L -o "$body_file" -w '%{http_code}' \
+              --max-time "$TIMEOUT" \
+              -A 'rainey-stack-uptime/1.0 (+https://github.com/datacendia/rainey-stack)' \
+              "$url" || echo '000')"
+            local ok=0
+            local IFS=','
+            for c in $accepted; do
+              if [ "$code" = "$c" ]; then ok=1; fi
+            done
+            if [ "$ok" -ne 1 ]; then
+              echo "::error title=uptime $url::expected one of [$accepted], got $code"
+              rm -f "$body_file"
+              fail=1
+              return
+            fi
+            if [ -n "$needle" ] && ! grep -q -F -- "$needle" "$body_file"; then
+              echo "::error title=uptime $url::status $code OK but body did not contain '$needle'"
+              rm -f "$body_file"
+              fail=1
+              return
+            fi
+            echo "OK $code  $url"
+            rm -f "$body_file"
+          }
+
+          check_url "https://raineylaguna.com/"                            "200"
+          check_url "https://raineylaguna.com/en"                          "200"
+          check_url "https://raineylaguna.com/auditoria"                   "200"
+          check_url "https://raineylagunastudios.com/"                     "200"
+          check_url "https://sereno.com.pe/"                               "200"
+          check_url "https://sereno.com.pe/api/public-signals"             "200" "signals"
+          # CRM is gated by auth; both 200 (login page) and a 302/307
+          # redirect to /login prove the app is up. Anything else is a
+          # real failure.
+          check_url "https://crm.raineylaguna.com/"                        "200,302,307"
+
+          if [ "$fail" -ne 0 ]; then
+            echo "::error::one or more uptime checks failed"
+            exit 1
+          fi
