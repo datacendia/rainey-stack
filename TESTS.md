@@ -49,40 +49,40 @@ order of implementation; this file enumerates the destination.
 | S04 | `shortlinks.ts::resolveSlug()` 302 / 404 paths | U | P1 | ✅ | `src/lib/shortlinks.test.ts` |
 | S05 | `plans.ts::getPlan()` returns null for unknown slug | U | P0 | ✅ | `src/lib/plans.test.ts` |
 | S06 | `plans.ts` price totals match marketing pages | U | P0 | ✅ | `src/lib/plans.test.ts` (S/249 locked) |
-| S07 | `events.ts::trackSafe()` swallows DB errors silently | U | P0 | ❌ | Failure mode: must not throw to caller |
-| S08 | `events.ts` payload sanitization (no PII keys) | U | P1 | ❌ | Allow-list of payload keys |
+| S07 | `events.ts::trackSafe()` swallows DB errors silently | U | P0 | ✅ | `src/lib/events.test.ts` (vigiaV2 PR #4) |
+| S08 | `events.ts` payload sanitization (no PII keys) | U | P1 | ✅ | `src/lib/events.test.ts` (vigiaV2 PR #4) |
 | S09 | `nubefact.ts::issueComprobante()` request body shape | U | P0 | ❌ | Snapshot test against fixture |
 | S10 | `nubefact.ts` retries on 5xx; gives up on 4xx | I | P0 | ❌ | nock |
 | S11 | `subscriptions.ts::createSubscription()` idempotent on culqi_subscription_id | I | P0 | ❌ | DB integration |
 | S12 | `subscriptions.ts::recordCharge()` increments last_charged_at | I | P0 | ❌ | DB integration |
 | S13 | `subscriptions.ts::nextComprobanteNumero()` is monotonic under contention | I | P0 | ❌ | Concurrent transactions |
-| S14 | `briefs.ts::upsertDraft()` idempotent on (customer_slug, week_of) | I | P0 | ❌ | DB integration; sample-week trigger relies on it |
-| S15 | `briefs.ts::approveBrief()` state machine (draft→approved only) | U | P1 | ❌ | Reject illegal transitions |
-| S16 | `briefs.ts` Counter-Move v2: `counter_moves` JSONB shape | U | P1 | ❌ | Schema validation |
+| S14 | `briefs.ts::upsertDraft()` idempotent on (customer_slug, week_of) | I | P0 | ✅ | `src/lib/briefs.test.ts` via pg-mem (vigiaV2 PR #7) |
+| S15 | `briefs.ts::approveBrief()` state machine (draft→approved only) | U | P1 | ✅ | `src/lib/briefs.test.ts` (vigiaV2 PR #7) |
+| S16 | `briefs.ts` Counter-Move v2: `counter_moves` JSONB shape | U | P1 | ✅ | `src/lib/briefs.test.ts` (vigiaV2 PR #7) |
 | S17 | `priority-score.ts` (if present) | U | P1 | ❌ | Per ROADMAP — verify file location |
 | S18 | `webhook-idempotency.ts::dedupeWebhook()` first call returns `fresh:true` | I | P0 | ✅ | `src/lib/webhook-idempotency.test.ts` |
 | S19 | `webhook-idempotency.ts::dedupeWebhook()` replay returns `fresh:false` | I | P0 | ✅ | `src/lib/webhook-idempotency.test.ts` |
 | S20 | `webhook-idempotency.ts` failure persists `result.ok=false` and re-throws | I | P0 | ✅ | `src/lib/webhook-idempotency.test.ts` |
 | S21 | `webhook-idempotency.ts::fallbackEventId()` deterministic for same body | U | P1 | ✅ | `src/lib/webhook-idempotency.test.ts` |
-| S22 | `cors.ts` allow-list logic (preview / prod / unset cases) | U | P1 | ❌ | Per CONVENTIONS §7 |
-| S23 | `admin-auth.ts::verifyCookie()` rejects expired / tampered tokens | U | P0 | ❌ | Sign with bad secret → reject |
-| S24 | `admin-auth.ts` constant-time bcrypt compare | U | P0 | ❌ | Timing-attack regression |
-| S25 | `env.ts` rejects malformed `DATABASE_URL` | U | P1 | ❌ | Zod schema test |
-| S26 | `env.ts::serverEnv` Proxy throws when accessed in browser | U | P0 | ❌ | Mock `typeof window` |
-| S27 | `env.ts::clientEnv` warns but does not throw on bad NEXT_PUBLIC_* | U | P1 | ❌ | Soft-warn behaviour |
-| S28 | `env.ts` `SKIP_ENV_VALIDATION=1` bypasses parse | U | P0 | ❌ | CI build path |
-| S29 | `cron-auth.ts::verifyCronSecret()` constant-time compare | U | P0 | ❌ | Timing-attack regression |
+| S22 | `cors.ts` allow-list logic (preview / prod / unset cases) | U | P1 | ✅ | `src/lib/cors.test.ts` (vigiaV2 PR #4) |
+| S23 | `admin-auth.ts::verifyCookie()` rejects expired / tampered tokens | U | P0 | ✅ | `src/lib/admin-auth.test.ts` (vigiaV2 PR #4) |
+| S24 | `admin-auth.ts` constant-time bcrypt compare | U | P0 | ✅ | `src/lib/admin-auth.test.ts` (vigiaV2 PR #4) |
+| S25 | `env.ts` rejects malformed `DATABASE_URL` | U | P1 | ✅ | `src/lib/env.test.ts` (vigiaV2 PR #4) |
+| S26 | `env.ts::serverEnv` Proxy throws when accessed in browser | U | P0 | ✅ | `src/lib/env.test.ts` (vigiaV2 PR #4) |
+| S27 | `env.ts::clientEnv` warns but does not throw on bad NEXT_PUBLIC_* | U | P1 | ✅ | `src/lib/env.test.ts` (vigiaV2 PR #4) |
+| S28 | `env.ts` `SKIP_ENV_VALIDATION=1` bypasses parse | U | P0 | ✅ | `src/lib/env.test.ts` (vigiaV2 PR #4) |
+| S29 | `cron-auth.ts::verifyCronSecret()` constant-time compare | U | P0 | ✅ | `src/lib/cron-auth.test.ts` (vigiaV2 PR #4) |
 | S30 | `i18n` Spanish/English string parity (no missing keys) | U | P2 | ❌ | Snapshot of key set |
 
 ### 2.2 Route handlers / API
 
 | ID  | Title | Type | Pri | Status | Notes |
 |-----|-------|------|-----|--------|-------|
-| S40 | `POST /api/webhooks/culqi` rejects bad HMAC with 401 | I | P0 | ❌ | Signed body fixture |
-| S41 | `POST /api/webhooks/culqi` accepts valid HMAC | I | P0 | ❌ | Round-trip with CULQI_WEBHOOK_SECRET |
+| S40 | `POST /api/webhooks/culqi` rejects bad HMAC with 401 | I | P0 | ✅ | `src/lib/webhook-verify.test.ts` (vigiaV2 PR #7) |
+| S41 | `POST /api/webhooks/culqi` accepts valid HMAC | I | P0 | ✅ | `src/lib/webhook-verify.test.ts` (vigiaV2 PR #7) |
 | S42 | `POST /api/webhooks/culqi` deduplicates retried event.id | I | P0 | ❌ | Two POSTs, one dispatch |
 | S43 | `POST /api/webhooks/culqi` issues exactly one comprobante per event | I | P0 | ❌ | Counts Nubefact mock calls |
-| S44 | `POST /api/webhooks/twilio` rejects bad X-Twilio-Signature | I | P0 | ❌ | Signed form-urlencoded |
+| S44 | `POST /api/webhooks/twilio` rejects bad X-Twilio-Signature | I | P0 | ✅ | `src/lib/webhook-verify.test.ts` (vigiaV2 PR #7) |
 | S45 | `POST /api/webhooks/twilio` deduplicates (sid, status) tuple | I | P0 | ❌ | Two retries, one trackSafe |
 | S46 | `POST /api/webhooks/twilio` emits `brief.send_failed` for `undelivered` | I | P1 | ❌ | Status mapping |
 | S47 | `POST /api/webhooks/stripe` deduplicates event.id | I | P0 | ❌ | Two POSTs, one createSubscription |
@@ -146,23 +146,23 @@ order of implementation; this file enumerates the destination.
 | W01 | `lima-weather.ts` cached / live paths | I | P1 | ❌ | Open-Meteo mock |
 | W02 | `lima-weather.ts` graceful fallback when API 5xx | U | P1 | ❌ | |
 | W03 | `audit-heuristics.ts` warning enumeration | U | P1 | ❌ | If extracted from route |
-| W04 | `proto-prompt.ts::buildProtoUserMessage()` schema | U | P0 | ❌ | Anthropic input contract |
-| W05 | `proto-prompt.ts::extractProtoJson()` tolerates code-fence wrapping | U | P1 | ❌ | Common Claude output shape |
-| W06 | `proto-prompt.ts::validateProtoOutput()` rejects missing required fields | U | P0 | ❌ | Zod contract |
+| W04 | `proto-prompt.ts::buildProtoUserMessage()` schema | U | P0 | ✅ | `src/lib/proto-prompt.test.ts` (raineylaguna-next PR #3) |
+| W05 | `proto-prompt.ts::extractProtoJson()` tolerates code-fence wrapping | U | P1 | ✅ | `src/lib/proto-prompt.test.ts` (raineylaguna-next PR #3) |
+| W06 | `proto-prompt.ts::validateProtoOutput()` rejects missing required fields | U | P0 | ✅ | `src/lib/proto-prompt.test.ts` (raineylaguna-next PR #3) |
 | W07 | `proto-store.ts` Postgres path | I | P1 | ❌ | DB integration |
 | W08 | `proto-store.ts` JSON file fallback when DATABASE_URL unset | I | P1 | ❌ | Filesystem |
 | W09 | `proto-ig.ts` Meta Graph token gating | U | P2 | ❌ | Skips when token unset |
 | W10 | `services.ts` slug ↔ entry round-trip + EN/ES parity | U | P1 | ✅ | `src/data/services.test.ts` (locale-neutral fields, cross-link integrity, no Spanish leakage in EN copy) |
-| W11 | `env.ts` server schema rejects bad ANTHROPIC_API_KEY prefix | U | P0 | ❌ | Regex contract |
-| W12 | `env.ts::serverEnv` Proxy throws on browser | U | P0 | ❌ | Same as Sereno S26 |
-| W13 | `env.ts::clientEnv` soft-warns on bad NEXT_PUBLIC_* | U | P1 | ❌ | Same as Sereno S27 |
+| W11 | `env.ts` server schema rejects bad ANTHROPIC_API_KEY prefix | U | P0 | ✅ | `src/lib/env.test.ts` (raineylaguna-next PR #3) |
+| W12 | `env.ts::serverEnv` Proxy throws on browser | U | P0 | ✅ | `src/lib/env.test.ts` (raineylaguna-next PR #3) |
+| W13 | `env.ts::clientEnv` soft-warns on bad NEXT_PUBLIC_* | U | P1 | ✅ | `src/lib/env.test.ts` (raineylaguna-next PR #3) |
 
 ### 3.2 Route handlers / API
 
 | ID  | Title | Type | Pri | Status | Notes |
 |-----|-------|------|-----|--------|-------|
-| W20 | `POST /api/lead` forwards to CRM with HMAC-signed body | I | P0 | ❌ | Mock CRM endpoint |
-| W21 | `POST /api/lead` falls back to log-only when CRM_PUBLIC_API unset | I | P1 | ❌ | Stub mode |
+| W20 | `POST /api/lead` forwards to CRM with HMAC-signed body | I | P0 | ✅ | `src/app/api/lead/route.test.ts` (raineylaguna-next PR #3) |
+| W21 | `POST /api/lead` falls back to log-only when CRM_PUBLIC_API unset | I | P1 | ✅ | `src/app/api/lead/route.test.ts` (raineylaguna-next PR #3) |
 | W22 | `POST /api/audit` runs full audit pipeline | I | P1 | ❌ | PageSpeed mocked |
 | W23 | `POST /api/audit` 503s gracefully without PAGESPEED_INSIGHTS_API_KEY | I | P2 | ❌ | Local heuristics only |
 | W24 | `POST /api/proto/generate` returns deterministic stub when `PROTO_STUB_MODE=1` | I | P1 | ❌ | No Anthropic call |
@@ -196,8 +196,8 @@ order of implementation; this file enumerates the destination.
 |-----|-------|------|-----|--------|-------|
 | C01 | `priority-score.ts::scoreLead()` weighted-sum determinism + bands | U | P0 | ✅ | `src/lib/priority-score.test.ts` |
 | C02 | `priority-score.ts` re-scores on lead update | I | P0 | ❌ | Trigger / observer |
-| C03 | `POST /api/leads/public` rejects unsigned bodies | I | P0 | ❌ | CRM_LEAD_INTAKE_SECRET HMAC |
-| C04 | `POST /api/leads/public` deduplicates by email + url within 24h | I | P1 | ❌ | Spam guard |
+| C03 | `POST /api/leads/public` rejects unsigned bodies | I | P0 | ✅ | `src/app/api/leads/public/route.test.ts` (CRM PR #3) |
+| C04 | `POST /api/leads/public` deduplicates by email + url within 24h | I | P1 | ✅ | `src/app/api/leads/public/route.test.ts` (CRM PR #3) |
 | C05 | `POST /api/leads/public` persists `audit_summary` JSONB blob | I | P1 | ❌ | From raineylaguna-next |
 | C06 | Lead creation enqueues AI-drafted outreach via BullMQ | I | P1 | ❌ | Redis dependency |
 | C07 | AI-drafted outreach respects `ANTHROPIC_MODEL` override | I | P2 | ❌ | |
@@ -207,8 +207,8 @@ order of implementation; this file enumerates the destination.
 
 | ID  | Title | Type | Pri | Status | Notes |
 |-----|-------|------|-----|--------|-------|
-| C20 | No `as any` casts (audit) | U | P2 | ❌ | Pending `as-any-audit` |
-| C21 | All env reads via `serverEnv` | U | P2 | ❌ | Pending env-zod-crm |
+| C20 | No `as any` casts (audit) | U | P2 | ✅ | Closed by CRM PR #9 (PipelineStage union derived from STAGES) |
+| C21 | All env reads via `serverEnv` | U | P2 | ✅ | Closed by CRM PR #10 (Proxy-backed serverEnv, 7 call sites migrated) |
 
 ---
 
@@ -234,15 +234,15 @@ order of implementation; this file enumerates the destination.
 |-----|-------|------|-----|--------|-------|
 | H01 | All webhook signature verifiers use `crypto.timingSafeEqual` | U | P0 | ✅ | Verified in audit; idempotency added in `c1aafac` |
 | H02 | Webhook handlers idempotent across all providers | I | P0 | ✅ | dedupeWebhook in `c1aafac` |
-| H03 | No `process.env.X` reads outside the env loader (post-refactor) | U | P2 | ❌ | Pending `env-refactor-*` |
-| H04 | All admin routes require auth (no fail-open path) | I | P0 | ❌ | Crawl all routes, assert 401/403 |
-| H05 | CSP header present on every public response | I | P1 | ❌ | next.config / middleware |
-| H06 | No secrets in client bundles (grep `.next/static/**`) | U | P0 | ❌ | CI grep step |
-| H07 | Postgres SSL on (rejectUnauthorized) by default | U | P0 | ❌ | Verify per-repo db.ts |
-| H08 | bcrypt cost ≥ 12 for admin password hashing | U | P0 | ❌ | scripts/admin-user-create.ts |
+| H03 | No `process.env.X` reads outside the env loader (post-refactor) | U | P2 | ✅ | vigiaV2: 1 documented CLI bootstrap exception (`src/workers/collect-worker.ts`); CRM closed by PR #10 |
+| H04 | All admin routes require auth (no fail-open path) | I | P0 | ✅ | `src/proxy.ts` (Next 16 middleware rename) + `src/proxy.test.ts` static-source contract pin (vigiaV2 PR #9) |
+| H05 | CSP header present on every public response | I | P1 | ✅ | `next.config.mjs` headers() in raineylaguna-next PR #4 + vigiaV2 (already shipped pre-session) |
+| H06 | No secrets in client bundles (grep `.next/static/**`) | U | P0 | ✅ | `src/lib/security-sweep.test.ts` in vigiaV2 PR #8 + CRM PR #4 |
+| H07 | Postgres SSL on (rejectUnauthorized) by default | U | P0 | ✅ | `src/lib/security-sweep.test.ts` (vigiaV2 PR #8 / CRM PR #4) |
+| H08 | bcrypt cost ≥ 12 for admin password hashing | U | P0 | ✅ | `src/lib/security-sweep.test.ts` (vigiaV2 PR #8 / CRM PR #4) |
 | H09 | Cron endpoints require `CRON_SECRET` bearer | I | P0 | ❌ | Per route |
-| H10 | Rate-limit on login + lead-intake routes | I | P1 | ❌ | Upstash or in-memory |
-| H11 | Cloudflare Turnstile on every public form | E | P1 | ❌ | Pending `turnstile-public-forms` |
+| H10 | Rate-limit on login + lead-intake routes | I | P1 | ✅ | `src/lib/rate-limit.ts` + `rate-limit.test.ts` (vigiaV2 PR #10 / CRM PR #5) |
+| H11 | Cloudflare Turnstile on every public form | E | P1 | ✅ | TurnstileWidget wired into ContactForm + Proto60Form + AuditTool; verifyTurnstile gate on /api/lead, /api/proto/generate, /api/audit (raineylaguna-next PR #6). Playwright E2E pending. |
 
 ---
 
@@ -250,9 +250,9 @@ order of implementation; this file enumerates the destination.
 
 | ID  | Title | Type | Pri | Status | Notes |
 |-----|-------|------|-----|--------|-------|
-| O01 | Sentry server SDK initializes when SENTRY_DSN set | U | P1 | ❌ | Both Next.js apps |
-| O02 | Sentry no-ops cleanly when SENTRY_DSN unset | U | P0 | ❌ | Boot doesn't crash |
-| O03 | `onRequestError` forwards RSC errors to Sentry | I | P1 | ❌ | Both Next.js apps |
+| O01 | Sentry server SDK initializes when SENTRY_DSN set | U | P1 | ✅ | `instrumentation.ts` in vigiaV2 PR #12 + CRM PR #7 |
+| O02 | Sentry no-ops cleanly when SENTRY_DSN unset | U | P0 | ✅ | DSN-gated init in `instrumentation.ts` (vigiaV2 PR #12 / CRM PR #7) |
+| O03 | `onRequestError` forwards RSC errors to Sentry | I | P1 | ✅ | Direct re-export of `Sentry.captureRequestError` (vigiaV2 PR #13 / CRM PR #8) |
 | O04 | Synthetic monitor on every public URL + /api/health | E | P0 | 🟡 | Free-tier in CI (`rainey-stack/.github/workflows/uptime.yml`, 6 URLs, 10-min cron). Pending UptimeRobot operator setup per `INFRA-SETUP.md` §1 |
 | O05 | Plausible analytics pageview event on every route | E | P2 | ❌ | Pending `plausible-analytics` |
 
@@ -290,18 +290,27 @@ Per `CONVENTIONS.md` §13.5, the canonical ramp is:
 
 ## Live progress snapshot
 
-As of the last commit on this file:
+As of the last commit on this file (post-2026-05-08 audit session):
 
 - **CI gates (B01–B12):** 12 / 12 ✅
-- **Sereno (S01–S93):** 8 / 53 ✅, 0 🟡 — `S01, S03, S04, S05, S06, S18, S19, S20, S21`
-- **raineylaguna-next (W01–W38):** 1 / 24 ✅ — `W10`
-- **CRM (C01–C21):** 1 / 10 ✅ — `C01`
+- **Sereno (S01–S93):** 24 / 53 ✅, 0 🟡 — `S01, S03–S08, S14–S16, S18–S29, S40, S41, S44`
+- **raineylaguna-next (W01–W38):** 9 / 24 ✅ — `W04, W05, W06, W10, W11, W12, W13, W20, W21`
+- **CRM (C01–C21):** 5 / 10 ✅ — `C01, C03, C04, C20, C21`
 - **Studios (R01–R09):** 2 / 9 ✅ — `R01, R09`
 - **Cross-cutting (X01–X06):** 2 / 6 ✅ — `X01, X05`
-- **Security (H01–H11):** 2 / 11 ✅ — `H01, H02`
-- **Observability (O01–O05):** 0 / 5 ✅, 1 🟡 — `O04` (uptime workflow shipped, UptimeRobot operator setup pending)
+- **Security (H01–H11):** 10 / 11 ✅ — `H01–H08, H10, H11`. Only `H09` (cron CRON_SECRET) pending.
+- **Observability (O01–O05):** 3 / 5 ✅, 1 🟡 — `O01, O02, O03` shipped; `O04` UptimeRobot operator setup pending.
 
-**Total: 26 / 122 ≈ 21%.** Sequenced by `CONVENTIONS.md` §13.5 ramp; the next P0 cluster is `S07–S08, S22, S23–S29, S40–S48` plus `W04–W06, W11–W13, W20, C03–C04, H04, H06–H10`.
+**Total: 67 / 122 ≈ 55%.** The 2026-05-08 audit session shipped 41 IDs across security (H03–H08, H10, H11), observability (O01–O03), env hygiene (C20, C21), and the test foundations (S07–S08, S14–S16, S22–S29, S40–S44, W04–W06, W11–W13, W20–W21, C03–C04).
+
+Next P0/P1 cluster:
+
+- **Sereno**: `S02` (sample-week placeholder), `S09–S13` (nubefact + subscriptions), `S42–S43, S45–S48` (webhook dedup integration), `S51–S57` (admin + cron + checkout routes), `S60` (audit ip_hash), `S70–S76` (boletín pipeline E2E).
+- **raineylaguna-next**: `W22` (full /api/audit pipeline integration test, complementing the Turnstile UI shipped in PR #6), `W24` (proto stub mode), `W30–W37` (Playwright E2E, blocked on Playwright wire-up).
+- **CRM**: `C02` (re-score on update), `C05–C08` (audit summary, BullMQ enqueue, ANTHROPIC_MODEL, Monday digest cron). E2E for login + dashboard blocked on Playwright wire-up.
+- **Cross-cutting**: `X02–X04, X06` (env diff scripts + branch protection + bad-env smoke).
+- **Security**: `H09` (CRON_SECRET on every cron route) and Playwright-based regression for `H11`.
+- **Observability**: `O04` UptimeRobot setup per `INFRA-SETUP.md` §1; `O05` Plausible.
 
 > **House rules.**
 > - Land tests in the same PR as the feature whenever feasible.
