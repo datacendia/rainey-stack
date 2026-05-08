@@ -44,6 +44,17 @@ zones:
         proxied: true
         comment: "raineylaguna-crm on Railway"
 
+      - type: CNAME
+        name: "*.preview"
+        value: TODO-railway-cname.up.railway.app
+        ttl: 1
+        proxied: true
+        comment: |
+          Wildcard for 60-Second Site v2 — every Proto-60 generated slug
+          resolves at <slug>.preview.raineylaguna.com. Edge middleware in
+          src/middleware.ts (raineylaguna-next) rewrites the request to
+          /p/<slug>. Must point at the same Railway service as the apex.
+
       - type: TXT
         name: "@"
         value: "v=spf1 include:_spf.mx.cloudflare.net ~all"
