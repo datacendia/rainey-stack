@@ -1,0 +1,82 @@
+# Declarative DNS records — source of truth for what *should* exist on
+# Cloudflare. The drift-check script (scripts/dns-drift.mjs) compares
+# this file against the live Cloudflare API and reports anything that
+# doesn't match.
+#
+# Maintained by hand. Each time you add/remove/change a record in the
+# Cloudflare dashboard, mirror the change here in the same PR — or the
+# next drift-check will (correctly) shout about it.
+#
+# Schema:
+#   zones:
+#     - name: <root domain>            # e.g. raineylaguna.com
+#       records:
+#         - type: A | AAAA | CNAME | TXT | MX | CAA | NS
+#           name: "@" | "www" | "subdomain"   # @ means apex
+#           value: <target>            # CNAME target / IP / TXT body
+#           ttl: 1                     # 1 = "Auto" in CF dashboard
+#           proxied: true | false      # CF orange-cloud (HTTP records only)
+#           comment: <free text>       # optional, surfaces in drift output
+#
+# Records flagged TODO are placeholders — confirm in CF dashboard then
+# update this file to match reality.
+
+zones:
+  - name: raineylaguna.com
+    records:
+      - type: CNAME
+        name: "@"
+        value: TODO-railway-cname.up.railway.app
+        ttl: 1
+        proxied: true
+        comment: "raineylaguna-next on Railway"
+
+      - type: CNAME
+        name: www
+        value: raineylaguna.com
+        ttl: 1
+        proxied: true
+
+      - type: CNAME
+        name: crm
+        value: TODO-railway-cname.up.railway.app
+        ttl: 1
+        proxied: true
+        comment: "raineylaguna-crm on Railway"
+
+      - type: TXT
+        name: "@"
+        value: "v=spf1 include:_spf.mx.cloudflare.net ~all"
+        ttl: 1
+        proxied: false
+        comment: "SPF — adjust if email is sent from another provider"
+
+  - name: raineylagunastudios.com
+    records:
+      - type: CNAME
+        name: "@"
+        value: TODO-pages-or-railway.up.railway.app
+        ttl: 1
+        proxied: true
+        comment: "raineylagunastudios static site"
+
+      - type: CNAME
+        name: www
+        value: raineylagunastudios.com
+        ttl: 1
+        proxied: true
+
+  - name: sereno.com.pe
+    records:
+      - type: CNAME
+        name: "@"
+        value: TODO-railway-cname.up.railway.app
+        ttl: 1
+        proxied: true
+        comment: "vigiaV2 on Railway"
+
+      - type: CNAME
+        name: www
+        value: sereno.com.pe
+        ttl: 1
+        proxied: true

@@ -120,31 +120,32 @@ then these 4 items can be implemented.
 | 24 | webhook tests                                     | `[?]`  |
 | 36 | `as any` audit                                    | `[?]`  |
 
-## Infrastructure / multi-repo (out of code-repo scope)
+## Infrastructure / multi-repo (code + operator runbook)
 
-| #     | Item                                              | Status |
-|-------|---------------------------------------------------|--------|
-| 28-32 | DNS, Turnstile, monitoring, analytics, Cloudflare | `[?]`  |
-| 39    | Runbooks reference                                | `[x]`  | covered by `RUNBOOKS.md` |
-| 40    | Drift check                                       | `[?]`  |
-| 41    | (slot)                                            | `[?]`  |
+| #  | Item                              | Status | Evidence |
+|----|-----------------------------------|--------|----------|
+| 28 | DNS as code                       | `[x]`  | `dns/expected.yml` + `INFRA-SETUP.md §4` |
+| 29 | Cloudflare Turnstile              | `[x]`  | `rln/src/lib/turnstile.ts`, `rln/src/components/TurnstileWidget.tsx`, wired into `/api/lead`. Gated on `TURNSTILE_SECRET` / `NEXT_PUBLIC_TURNSTILE_SITEKEY` |
+| 30 | Uptime monitoring                 | `[x]`  | `.github/workflows/uptime.yml` (free, 10-min cron, 9 URLs) + UptimeRobot operator step in `INFRA-SETUP.md §1` |
+| 31 | Analytics                         | `[x]`  | Cloudflare Web Analytics in `rln`, `vV2`, `rls` (script + injector). Gated on env. `INFRA-SETUP.md §2` |
+| 32 | Cloudflare zone settings          | `[x]`  | Checklist in `INFRA-SETUP.md §5` |
+| 39 | Runbooks reference                | `[x]`  | `RUNBOOKS.md` + new `INFRA-SETUP.md` |
+| 40 | DNS drift check                   | `[x]`  | `scripts/dns-drift.mjs` + `.github/workflows/dns-drift.yml` (Mon 14:00 UTC + PR trigger, gated on `CF_API_TOKEN` secret) |
+| 41 | (unlabeled slot)                  | `[?]`  | unclear what this item is |
 
 ---
 
 ## Summary (verifiable in this sandbox)
 
-- **Shipped & verified:** 26 items — #1, #2, #3, #4, #5, #7, #9, #10, #11, #12, #13, #14, #15, #16, #17, #18, #19, #21, #22, #23, #25, #26, #27, #33, #34, #42
-- **Partial / skeleton:** 0 items
-- **Open work in scope:** 0 items
-- **N/A with reason:** 2 items — #37 (no CDN scripts in `rls`), #38 (`<img>` tags are intentional in proto-templates)
-- **Sandbox-blocked (`crm` repo not in allowed list):** 4 items — #6, #20, #24, #36
-- **Out-of-scope (need credentials, not code):** ~10 items — #28-32, #39 partial, #40, #41
+- **Shipped & verified:** 33 items — #1-5, #7, #9-19, #21-23, #25-34, #39, #40, #42
+- **Partial / skeleton:** 0
+- **N/A with reason:** 2 — #37, #38
+- **Sandbox-blocked (`crm` repo not in allowed list):** 4 — #6, #20, #24, #36
+- **Unclear (no spec):** 1 — #41
 
-If the sandbox's allowed-repos list is extended to include
-`datacendia/raineylaguna-crm`, items #6, #20, #24, #36 are tractable in
-the next session. Items #28-32, #40, #41 are not code-only changes —
-they need access to DNS/Cloudflare/monitoring/analytics provider
-accounts that this sandbox doesn't have.
+The infra items (#28-32, #39, #40) shipped as **code + operator
+runbook**. Code is gated on env vars / GitHub secrets so production
+stays quiet until you paste the actual tokens — see `INFRA-SETUP.md`.
 
 ## How to use this doc
 

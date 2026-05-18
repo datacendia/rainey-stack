@@ -1,0 +1,90 @@
+name: uptime
+
+# Free zero-third-party uptime monitor. Runs every 10 minutes against every
+# production URL listed below; fails the action (and emails the repo
+# owner via GitHub's default notifications) if any URL doesn't return a
+# 2xx within the timeout.
+#
+# This is a backstop for whatever real monitoring tool the operator
+# eventually wires up (UptimeRobot free tier, Cloudflare Notifications,
+# BetterStack, etc — see INFRA-SETUP.md). It costs $0 and runs forever as
+# long as the repo is on GitHub.
+#
+# Edit the URLs list below as new public surfaces ship.
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'   # every 10 min
+  workflow_dispatch: {}      # manual run from the Actions tab
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/uptime.yml'
+
+concurrency:
+  group: uptime
+  cancel-in-progress: true
+
+jobs:
+  ping:
+    name: Ping production URLs
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        url:
+          # raineylaguna stack
+          - https://raineylaguna.com/
+          - https://raineylaguna.com/auditoria
+          - https://raineylaguna.com/en
+          - https://raineylagunastudios.com/
+          # vigiaV2 / Sereno
+          - https://sereno.com.pe/
+          - https://sereno.com.pe/pricing
+          - https://sereno.com.pe/muestra
+          - https://sereno.com.pe/api/public-signals
+          # crm
+          - https://crm.raineylaguna.com/
+
+    steps:
+      - name: HEAD ${{ matrix.url }}
+        run: |
+          set -euo pipefail
+          # Some hosts (Cloudflare in particular) reject HEAD; if HEAD
+          # returns 4xx/405 fall through to GET. Three retries with
+          # exponential backoff to absorb edge-cache cold starts.
+          attempt=0
+          max=3
+          delay=5
+          until [ $attempt -ge $max ]; do
+            attempt=$((attempt + 1))
+            echo "attempt $attempt of $max"
+
+            head_code=$(curl -sS -o /dev/null -w '%{http_code}' \
+              --max-time 20 -A 'rainey-stack-uptime-bot' \
+              -I "${{ matrix.url }}" || echo "000")
+            echo "HEAD → $head_code"
+            if [[ "$head_code" =~ ^2 ]]; then
+              echo "OK (HEAD)"
+              exit 0
+            fi
+
+            get_code=$(curl -sS -o /dev/null -w '%{http_code}' \
+              --max-time 20 -A 'rainey-stack-uptime-bot' \
+              "${{ matrix.url }}" || echo "000")
+            echo "GET  → $get_code"
+            if [[ "$get_code" =~ ^2 ]]; then
+              echo "OK (GET — host rejected HEAD with $head_code)"
+              exit 0
+            fi
+
+            if [ $attempt -lt $max ]; then
+              echo "non-2xx; retrying in $delay s..."
+              sleep $delay
+              delay=$((delay * 2))
+            fi
+          done
+
+          echo "::error title=Uptime check failed::${{ matrix.url }} returned non-2xx after $max attempts"
+          exit 1
